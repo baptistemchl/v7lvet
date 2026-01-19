@@ -1,0 +1,16 @@
+{
+  "name": "V7LVET - Expert-Comptable",
+  "short_name": "V7LVET",
+  "description": "Cabinet d'expertise comptable haut de gamme",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#a78bfa",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
