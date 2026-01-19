@@ -1,19 +1,26 @@
 'use client'
 
-import { useRef, useState } from 'react'
-import { motion, useMotionTemplate, useMotionValue, useSpring } from 'framer-motion'
+import React, { useRef, useState } from 'react'
+import {
+  motion,
+  useMotionTemplate,
+  useMotionValue,
+  useSpring,
+} from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface Card3DProps {
   children: React.ReactNode
   className?: string
   containerClassName?: string
+  glowColor?: string
 }
 
 export function Card3D({
   children,
   className,
   containerClassName,
+  glowColor,
 }: Card3DProps) {
   const ref = useRef<HTMLDivElement>(null)
   const [isHovered, setIsHovered] = useState(false)
@@ -21,7 +28,6 @@ export function Card3D({
   const mouseX = useMotionValue(0)
   const mouseY = useMotionValue(0)
 
-  // Smooth spring for 3D rotation
   const rotateX = useSpring(0, { stiffness: 200, damping: 25 })
   const rotateY = useSpring(0, { stiffness: 200, damping: 25 })
 
@@ -35,11 +41,9 @@ export function Card3D({
     const percentX = (e.clientX - centerX) / (rect.width / 2)
     const percentY = (e.clientY - centerY) / (rect.height / 2)
 
-    // 3D tilt effect
     rotateX.set(-percentY * 12)
     rotateY.set(percentX * 12)
 
-    // Mouse position for spotlight
     mouseX.set(e.clientX - rect.left)
     mouseY.set(e.clientY - rect.top)
   }
@@ -50,16 +54,16 @@ export function Card3D({
     setIsHovered(false)
   }
 
-  // Spotlight gradient that follows the mouse
+  const spotlightColor = glowColor ?? 'rgba(167, 139, 250, 0.12)'
+
   const spotlightGradient = useMotionTemplate`
     radial-gradient(
       600px circle at ${mouseX}px ${mouseY}px,
-      rgba(167, 139, 250, 0.12),
+      ${spotlightColor},
       transparent 40%
     )
   `
 
-  // Subtle border glow that follows mouse
   const borderGlow = useMotionTemplate`
     radial-gradient(
       300px circle at ${mouseX}px ${mouseY}px,
@@ -88,7 +92,7 @@ export function Card3D({
         )}
       >
         {/* Glass background */}
-        <div 
+        <div
           className={cn(
             'absolute inset-0 rounded-3xl',
             'bg-gradient-to-br from-white/[0.08] via-white/[0.04] to-white/[0.08]',
@@ -98,7 +102,7 @@ export function Card3D({
         />
 
         {/* Border - subtle glass edge */}
-        <div 
+        <div
           className={cn(
             'absolute inset-0 rounded-3xl',
             'border border-white/[0.08]',
@@ -129,7 +133,7 @@ export function Card3D({
         />
 
         {/* Inner shadow for depth */}
-        <div 
+        <div
           className={cn(
             'absolute inset-0 rounded-3xl pointer-events-none',
             'shadow-[inset_0_0_60px_rgba(0,0,0,0.15)]',
@@ -139,7 +143,7 @@ export function Card3D({
         />
 
         {/* Content with 3D transform */}
-        <motion.div 
+        <motion.div
           className="relative z-10"
           style={{ transform: 'translateZ(20px)' }}
         >
@@ -156,31 +160,31 @@ interface GlassCardProps {
   hover?: boolean
 }
 
-export function GlassCard({ children, className, hover = true }: GlassCardProps) {
+export function GlassCard({
+  children,
+  className,
+  hover = true,
+}: GlassCardProps) {
   return (
     <div
       className={cn(
         'relative rounded-3xl p-8 overflow-hidden',
-        // Glass background
         'bg-gradient-to-br from-white/[0.08] via-white/[0.04] to-white/[0.08]',
         'backdrop-blur-xl',
-        // Border
         'border border-white/[0.08]',
-        // Shadow
         'shadow-[0_8px_32px_rgba(0,0,0,0.12)]',
-        // Hover effects
         hover && [
           'transition-all duration-500 ease-out',
           'hover:border-white/[0.15]',
           'hover:shadow-[0_16px_48px_rgba(0,0,0,0.15),0_0_0_1px_rgba(167,139,250,0.1)]',
-          'hover:bg-gradient-to-br hover:from-white/[0.1] hover:via-white/[0.05] hover:to-white/[0.1]'
+          'hover:bg-gradient-to-br hover:from-white/[0.1] hover:via-white/[0.05] hover:to-white/[0.1]',
         ],
         className
       )}
     >
       {/* Top edge highlight */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-      
+
       {/* Content */}
       <div className="relative z-10">{children}</div>
     </div>
@@ -194,7 +198,12 @@ interface StatCardProps {
   delay?: number
 }
 
-export function StatCard({ value, label, className, delay = 0 }: StatCardProps) {
+export function StatCard({
+  value,
+  label,
+  className,
+  delay = 0,
+}: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
